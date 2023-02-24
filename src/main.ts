@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
-import log4js, { getLogger } from "log4js";
+import { getLogger } from "log4js";
 import { middleware } from "./middleware";
-import { POST } from "./admin";
+import { DELETE, PATCH, POST } from "./admin";
 import { config } from "dotenv";
 
 console.log(`=----------------------------=`);
@@ -15,15 +15,6 @@ console.log();
 config();
 
 // INIT LOGGER
-log4js.configure({
-  appenders: {
-    console: { type: "console" },
-    file: { type: "file", filename: "logs/quantumlink.log" },
-  },
-  categories: {
-    default: { appenders: ["console", "file"], level: "debug" },
-  },
-});
 const logger = getLogger("console");
 logger.level = "debug";
 
@@ -64,6 +55,8 @@ app.get("/*", async (req, res) => {
 });
 
 app.post("/", POST);
+app.delete("/", DELETE);
+app.patch("/", PATCH);
 
 // ERROR HANDLING
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
@@ -74,6 +67,12 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 // START SERVER
 app.listen(3000, () => {
   logger.info(`Listening on http://127.0.0.1:${3000}`);
+});
+
+process.on("SIGINT", () => {
+  logger.info("Shutting down...");
+  prisma.$disconnect();
+  process.exit();
 });
 
 export default app;
