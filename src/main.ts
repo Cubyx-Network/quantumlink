@@ -5,6 +5,7 @@ import { getLogger } from "log4js";
 import { middleware } from "./middleware";
 import { DELETE, PATCH, POST } from "./admin";
 import { config } from "dotenv";
+import { status, status500 } from "./response";
 
 console.log(`=----------------------------=`);
 console.log(`  C U B Y X   N E T W O R K `);
@@ -51,7 +52,7 @@ app.get("/*", async (req, res) => {
 
   if (defaultLink) return res.redirect(`${defaultLink.url}${req.originalUrl}`);
 
-  res.send("QuantumLink v1.0.0");
+  status(res, 420, "Mayonaise ist kein Instrument, Patrick.");
 });
 
 app.post("/", POST);
@@ -61,7 +62,7 @@ app.patch("/", PATCH);
 // ERROR HANDLING
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   logger.error(err);
-  res.status(500).send("Internal Server Error");
+  status500(res);
 });
 
 // START SERVER
