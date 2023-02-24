@@ -1,0 +1,30 @@
+{
+  "name": "cubyx-quantumlink",
+  "version": "1.0.0",
+  "description": "git remote add origin git@github.com:Cubyx-Network/quantumlink.git",
+  "main": "dist/main.js",
+  "repository": "https://github.com/Cubyx-Network/quantumlink",
+  "author": "Cubyx Network",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/node": "^18.14.1",
+    "prisma": "^4.10.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@prisma/client": "4.10.1",
+    "@types/cors": "^2.8.13",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "log4js": "^6.8.0",
+    "tslib": "^2.5.0"
+  },
+  "scripts": {
+    "start": "node dist/main.js",
+    "build": "tsc",
+    "dev": "ts-node src/main.ts",
+    "migrate": "prisma migrate dev --name init"
+  }
+}
