@@ -1,12 +1,18 @@
+import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import log4js, { getLogger } from "log4js";
+import { middleware } from "./middleware";
+import { POST } from "./admin";
+import { config } from "dotenv";
 
 console.log(`=----------------------------=`);
 console.log(`  C U B Y X   N E T W O R K `);
 console.log(`     QuantumLink v1.0.0`);
 console.log(`=----------------------------=`);
 console.log();
+
+config();
 
 // INIT LOGGER
 log4js.configure({
@@ -20,6 +26,9 @@ log4js.configure({
 });
 const logger = getLogger("console");
 logger.level = "debug";
+
+// INIT PRISMA
+const prisma = new PrismaClient();
 
 // INIT EXPRESS
 const app = express();
@@ -38,7 +47,23 @@ app.use((req, _res, next) => {
   next();
 });
 
+// MIDDLEWARE
+app.use(middleware);
+
 // ROUTES
+app.get("/*", async (req, res) => {
+  const defaultLink = await prisma.link.findFirst({
+    where: {
+      id: "default",
+    },
+  });
+
+  if (defaultLink) return res.redirect(`${defaultLink.url}${req.originalUrl}`);
+
+  res.send("QuantumLink v1.0.0");
+});
+
+app.post("/", POST);
 
 // ERROR HANDLING
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
@@ -52,4 +77,4 @@ app.listen(3000, () => {
 });
 
 export default app;
-export { logger };
+export { logger, prisma };

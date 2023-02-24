@@ -17,6 +17,7 @@
     "@prisma/client": "4.10.1",
     "@types/cors": "^2.8.13",
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "log4js": "^6.8.0",
     "tslib": "^2.5.0"
