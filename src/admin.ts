@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { prisma } from "./main";
+import { config, prisma } from "./main";
 import {
   status400,
   status401,
@@ -13,7 +13,7 @@ export async function POST(req: Request, res: Response) {
   const auth = req.headers.authorization;
 
   if (!id || !url) return res.status(400).send("Bad Request");
-  if (auth !== process.env.ADMIN_KEY) {
+  if (auth !== config.admin_secret) {
     return status401(res);
   }
 
@@ -40,7 +40,7 @@ export async function DELETE(req: Request, res: Response) {
   const auth = req.headers.authorization;
 
   if (!id) return status400(res);
-  if (auth !== process.env.ADMIN_KEY) {
+  if (auth !== config.admin_secret) {
     return status401(res);
   }
 
@@ -65,7 +65,7 @@ export async function PATCH(req: Request, res: Response) {
   const auth = req.headers.authorization;
 
   if (!id || !url) return status400(res);
-  if (auth !== process.env.ADMIN_KEY) {
+  if (auth !== config.admin_secret) {
     return status401(res);
   }
 
