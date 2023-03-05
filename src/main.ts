@@ -1,19 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
-import { getLogger } from "log4js";
+import { Config, getLogger } from "log4js";
 import { middleware } from "./middleware";
 import { DELETE, PATCH, POST } from "./admin";
-import { config } from "dotenv";
 import { status, status500 } from "./response";
+import { init, start, stop } from "./discord";
+
+const config: Config = require("../config.json");
 
 console.log(`=----------------------------=`);
 console.log(`  C U B Y X   N E T W O R K `);
 console.log(`     QuantumLink v1.0.0`);
 console.log(`=----------------------------=`);
 console.log();
-
-config();
 
 // INIT LOGGER
 const logger = getLogger("console");
@@ -66,15 +66,28 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 // START SERVER
-app.listen(3000, () => {
-  logger.info(`Listening on http://127.0.0.1:${3000}`);
+app.listen(config.port, () => {
+  logger.info(`Listening on http://127.0.0.1:${config.port}`);
 });
 
 process.on("SIGINT", () => {
   logger.info("Shutting down...");
   prisma.$disconnect();
-  process.exit();
+  stop().then(() => {
+    process.exit();
+  });
+});
+
+// DISCORD BOT
+logger.info("Init Discord Bot...");
+init().then(() => {
+  logger.info("Discord Bot initialized.");
+});
+
+logger.info("Starting Discord Bot...");
+start().then(() => {
+  logger.info("Discord Bot started.");
 });
 
 export default app;
-export { logger, prisma };
+export { logger, prisma, config };
