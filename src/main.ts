@@ -5,9 +5,11 @@ import { Config, getLogger } from "log4js";
 import { middleware } from "./middleware";
 import { DELETE, PATCH, POST } from "./admin";
 import { status, status500 } from "./response";
-import { init, start, stop } from "./discord";
+import { init, start, stop } from "./discordbot/discord";
+import dotenv from "dotenv";
 
 const config: Config = require("../config.json");
+dotenv.config();
 
 console.log(`=----------------------------=`);
 console.log(`  C U B Y X   N E T W O R K `);
