@@ -36,7 +36,7 @@ export async function init() {
     } catch (error) {
       logger.error(error);
       await interaction.reply({
-        content: "There was an error while executing this command!",
+        content: "Ein unerwarteter Fehler ist aufgetreten :(",
         ephemeral: true,
       });
     }
