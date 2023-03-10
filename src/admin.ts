@@ -155,3 +155,11 @@ export async function updateLink(
       throw 500;
     });
 }
+
+/**
+ * Gets all links.
+ * @returns All links.
+ */
+export async function getLinks(): Promise<Link[]> {
+  return prisma.link.findMany();
+}
