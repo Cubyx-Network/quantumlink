@@ -12,7 +12,7 @@ export default async function updateSlashCommands() {
   const commandsPath = path.join(__dirname, "commands");
   const commandFiles = fs
     .readdirSync(commandsPath)
-    .filter((file: string) => file.endsWith(".ts"));
+    .filter((file: string) => file.endsWith(".ts") || file.endsWith(".js"));
 
   for (const file of commandFiles) {
     const { default: command } = require(`./commands/${file}`) as {
