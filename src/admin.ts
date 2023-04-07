@@ -133,18 +133,27 @@ export async function deleteLink(id: string): Promise<Link> {
  */
 export async function updateLink(
   id: string,
-  url: string,
+  url?: string,
   description?: string
 ): Promise<Link> {
   logger.info(`Updating link with ID ${id}...`);
+
+  const link = await prisma.link.findFirst({
+    where: {
+      id,
+    },
+  });
+
+  if (!link) throw 404;
+
   return prisma.link
     .update({
       where: {
         id,
       },
       data: {
-        url,
-        description,
+        url: url || link.url,
+        description: description || link.description,
       },
     })
     .catch((err) => {

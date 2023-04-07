@@ -19,10 +19,7 @@ export default {
         .setRequired(true)
     )
     .addStringOption((option) =>
-      option
-        .setName("url")
-        .setDescription("Die neue URL des Links.")
-        .setRequired(true)
+      option.setName("url").setDescription("Die neue URL des Links.")
     )
     .addStringOption((option) =>
       option
@@ -35,33 +32,33 @@ export default {
     const options = interaction.options as CommandInteractionOptionResolver;
 
     const id = options.getString("id");
-    const url = options.getString("url");
+    const url = options.getString("url") || undefined;
     const description = options.getString("description") || undefined;
 
-    if (!id || !url) {
-      await interaction.editReply("Es wurde keine ID oder URL angegeben.");
+    if (!id) {
+      await interaction.editReply("Es wurde keine ID angegeben.");
       return;
     }
 
     updateLink(id, url, description)
-      .then(async () => {
+      .then(async (link) => {
         const embed = new EmbedBuilder()
-          .setTitle("Link erstellt")
+          .setTitle("Link bearbeitet")
           .setDescription(`Der Link mit der ID ${id} wurde bearbeitet.`)
           .setColor(0x0000ff)
           .setTimestamp(new Date())
           .setFields([
             {
               name: "ID",
-              value: id,
+              value: link.id,
             },
             {
               name: "URL",
-              value: url,
+              value: link.url,
             },
             {
               name: "Beschreibung",
-              value: description || "Keine",
+              value: link.description || "Keine Beschreibung",
             },
           ]);
 
@@ -70,9 +67,9 @@ export default {
         });
       })
       .catch(async (err) => {
-        if (err === 409) {
+        if (err === 404) {
           await interaction.editReply(
-            "Ein Link mit dieser ID existiert bereits."
+            "Ein Link mit dieser ID existiert nicht."
           );
           return;
         }
