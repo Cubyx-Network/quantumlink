@@ -1,12 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
-import { Config, getLogger } from "log4js";
+import { getLogger } from "log4js";
 import { middleware } from "./middleware";
 import { DELETE, PATCH, POST } from "./admin";
 import { status, status500 } from "./response";
 import { init, start, stop } from "./discordbot/discord";
 import dotenv from "dotenv";
+import { Config } from "./config";
+import * as Minio from "minio";
 
 const config: Config = require("../config.json");
 dotenv.config();
@@ -79,6 +81,19 @@ process.on("SIGINT", () => {
     process.exit();
   });
 });
+
+// INIT MINIO
+logger.info("Init Minio...");
+const minio = new Minio.Client({
+  endPoint: config.minio.endpoint,
+  port: config.minio.port,
+  useSSL: config.minio.useSSL,
+  accessKey: config.minio.auth.accessKey,
+  secretKey: config.minio.auth.secretKey,
+});
+
+export { minio };
+logger.info("Minio initialized.");
 
 // DISCORD BOT
 logger.info("Init Discord Bot...");

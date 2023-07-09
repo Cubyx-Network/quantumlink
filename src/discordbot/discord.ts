@@ -1,15 +1,28 @@
 import { config, logger } from "../main";
-import { ActivityType, Client, Collection, Events } from "discord.js";
+import {
+  ActivityType,
+  Client,
+  Collection,
+  Events,
+  IntentsBitField,
+} from "discord.js";
 import * as path from "path";
 import * as fs from "fs";
 import updateSlashCommands from "./slashCommands";
 import ISlashCommand from "./ISlashCommand";
+import uploadFileNewsEvent from "./events/uploadFileNews";
 
 type DiscordClient = Client & {
   commands: Collection<string, any>;
 };
 
-const client = new Client({ intents: ["GuildMessages"] }) as DiscordClient;
+const client = new Client({
+  intents: [
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.MessageContent,
+  ],
+}) as DiscordClient;
 client.commands = new Collection();
 
 /**
@@ -39,6 +52,14 @@ export async function init() {
         content: "Ein unerwarteter Fehler ist aufgetreten :(",
         ephemeral: true,
       });
+    }
+  });
+
+  client.on(Events.MessageCreate, (message) => {
+    if (message.author.bot) return;
+
+    if (message.channel.id === config.discord.upload_channel) {
+      uploadFileNewsEvent(message);
     }
   });
 
