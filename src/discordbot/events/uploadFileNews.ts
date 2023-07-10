@@ -40,21 +40,21 @@ export default async function uploadFileNewsEvent(message: Message) {
             `<@${message.author.id}> hat eine News hochgeladen: https://${config.minio.endpoint}/${config.minio.buckets.website}/news/${response}`
           );
         }
+      }).then(() => {
+        reply.edit("News Beiträge werden aktualisiert...");
+
+        fetch(`${config.news_update.endpoint}?apiKey=${config.news_update.apiKey}`).then((response: Response) => {
+          if (response.ok) {
+            reply.edit("News Beiträge wurden aktualisiert.");
+          } else {
+            reply.edit("News Beiträge konnten nicht aktualisiert werden.");
+          }
+        }).catch((e: Error) => {
+          logger.error(e);
+          reply.edit("Fehler beim Aktualisieren der News Beiträge.");
+        });
       });
     }
-
-    reply.edit("News Beiträge werden aktualisiert...");
-
-    fetch(`${config.news_update.endpoint}?apiKey=${config.news_update.apiKey}`).then((response: Response) => {
-        if (response.ok) {
-            reply.edit("News Beiträge wurden aktualisiert.");
-        } else {
-            reply.edit("News Beiträge konnten nicht aktualisiert werden.");
-        }
-    }).catch((e: Error) => {
-        logger.error(e);
-        reply.edit("Fehler beim Aktualisieren der News Beiträge.");
-    });
 
     setTimeout(() => {
       reply.delete();
