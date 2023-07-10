@@ -18,4 +18,8 @@ export type Config = {
   discord: {
     upload_channel: string;
   };
+  news_update: {
+    endpoint: string;
+    apiKey: string;
+  }
 };

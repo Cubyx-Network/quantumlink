@@ -1,5 +1,5 @@
-import { Message } from "discord.js";
-import { config, minio } from "../../main";
+import {Message} from "discord.js";
+import {config, logger, minio} from "../../main";
 
 const fetch = require("node-fetch");
 
@@ -43,7 +43,22 @@ export default async function uploadFileNewsEvent(message: Message) {
       });
     }
 
-    reply.delete();
+    reply.edit("News Beiträge werden aktualisiert...");
+
+    fetch(`${config.news_update.endpoint}?apiKey=${config.news_update.apiKey}`).then((response: Response) => {
+        if (response.ok) {
+            reply.edit("News Beiträge wurden aktualisiert.");
+        } else {
+            reply.edit("News Beiträge konnten nicht aktualisiert werden.");
+        }
+    }).catch((e: Error) => {
+        logger.error(e);
+        reply.edit("Fehler beim Aktualisieren der News Beiträge.");
+    });
+
+    setTimeout(() => {
+      reply.delete();
+    }, 1000 * 10);
   });
 }
 
