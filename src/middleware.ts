@@ -7,7 +7,7 @@ export async function middleware(
   res: Response,
   next: NextFunction
 ) {
-  const route = req.originalUrl
+  const route = req.path
 
   const link = await prisma.link.findFirst({
     where: {
