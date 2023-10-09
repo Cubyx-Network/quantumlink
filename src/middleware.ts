@@ -15,7 +15,7 @@ export async function middleware(
     },
   })
 
-  if (req.params.raw === 'true') {
+  if (req.query.raw === 'true') {
     const auth = req.headers.authorization
     if (auth !== config.admin_secret) {
       return status401(res)
