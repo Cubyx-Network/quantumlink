@@ -1,69 +1,75 @@
-import { Link } from "@prisma/client";
-import { Request, Response } from "express";
-import { config, logger, prisma } from "./main";
+import { Link } from '@prisma/client'
+import { Request, Response } from 'express'
+import { config, logger, prisma } from './main'
 import {
   status400,
   status401,
   status404,
   status409,
   status500,
-} from "./response";
+} from './response'
 
 export async function POST(req: Request, res: Response) {
-  const { id, url, description } = req.body;
-  const auth = req.headers.authorization;
+  const { id, url, description } = req.body
+  const auth = req.headers.authorization
 
-  if (!id || !url) return res.status(400).send("Bad Request");
   if (auth !== config.admin_secret) {
-    return status401(res);
+    return status401(res)
   }
+
+  if (req.body.all === true) {
+    const links = await getLinks()
+    return res.json(links)
+  }
+
+  if (!id || !url) return res.status(400).send('Bad Request')
 
   const link = await createLink(id, url, description).catch((err) => {
     if (err === 409) {
-      return status409(res);
+      return status409(res)
     }
-    return status500(res);
-  });
+    return status500(res)
+  })
 
-  return res.json(link);
+  return res.json(link)
 }
 
 export async function DELETE(req: Request, res: Response) {
-  const { id } = req.body;
-  const auth = req.headers.authorization;
+  const { id } = req.body
+  const auth = req.headers.authorization
 
-  if (!id) return status400(res);
+  if (!id) return status400(res)
   if (auth !== config.admin_secret) {
-    return status401(res);
+    return status401(res)
   }
 
   const link = await deleteLink(id).catch((err) => {
     if (err === 404) {
-      return status404(res);
+      return status404(res)
     }
-    return status500(res);
-  });
+    return status500(res)
+  })
 
-  return res.json(link);
+  return res.json(link)
 }
 
 export async function PATCH(req: Request, res: Response) {
-  const { id, url, description } = req.body;
-  const auth = req.headers.authorization;
+  const { id, url, description } = req.body
+  const auth = req.headers.authorization
 
-  if (!id || !url) return status400(res);
+  if (!id || !url) return status400(res)
   if (auth !== config.admin_secret) {
-    return status401(res);
+    return status401(res)
   }
 
   const link = await updateLink(id, url, description).catch((err) => {
     if (err === 404) {
-      return status404(res);
+      return status404(res)
     }
-    return status500(res);
-  });
+    return status500(res)
+  })
 
-  return res.json(link);
+  return res.json(link)
 }
 
 /**
@@ -80,7 +86,7 @@ export async function createLink(
   url: string,
   description?: string
 ): Promise<Link> {
-  logger.info(`Creating link with ID ${id}...`);
+  logger.info(`Creating link with ID ${id}...`)
   return prisma.link
     .create({
       data: {
@@ -90,12 +96,12 @@ export async function createLink(
       },
     })
     .catch((err) => {
-      if (err.code === "P2002") {
-        throw 409;
+      if (err.code === 'P2002') {
+        throw 409
       }
-      logger.error(err);
-      throw 500;
-    });
+      logger.error(err)
+      throw 500
+    })
 }
 
 /**
@@ -106,7 +112,7 @@ export async function createLink(
  * @throws 500 if an error occurred.
  */
 export async function deleteLink(id: string): Promise<Link> {
-  logger.info(`Deleting link with ID ${id}...`);
+  logger.info(`Deleting link with ID ${id}...`)
   return prisma.link
     .delete({
       where: {
@@ -114,12 +120,12 @@ export async function deleteLink(id: string): Promise<Link> {
       },
     })
     .catch((err) => {
-      if (err.code === "P2025") {
-        throw 404;
+      if (err.code === 'P2025') {
+        throw 404
       }
-      logger.error(err);
-      throw 500;
-    });
+      logger.error(err)
+      throw 500
+    })
 }
 
 /**
@@ -136,15 +142,15 @@ export async function updateLink(
   url?: string,
   description?: string
 ): Promise<Link> {
-  logger.info(`Updating link with ID ${id}...`);
+  logger.info(`Updating link with ID ${id}...`)
 
   const link = await prisma.link.findFirst({
     where: {
       id,
     },
-  });
+  })
 
-  if (!link) throw 404;
+  if (!link) throw 404
 
   return prisma.link
     .update({
@@ -157,12 +163,12 @@ export async function updateLink(
       },
     })
     .catch((err) => {
-      if (err.code === "P2025") {
-        throw 404;
+      if (err.code === 'P2025') {
+        throw 404
       }
-      logger.error(err);
-      throw 500;
-    });
+      logger.error(err)
+      throw 500
+    })
 }
 
 /**
@@ -170,5 +176,5 @@ export async function updateLink(
  * @returns All links.
  */
 export async function getLinks(): Promise<Link[]> {
-  return prisma.link.findMany();
+  return prisma.link.findMany()
 }
